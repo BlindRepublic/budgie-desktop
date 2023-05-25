@@ -96,16 +96,10 @@ intltool = find_program('intltool-merge')
 
 # Make sure this is accessible to panel applet builds
 plugin_libdir = join_paths(libdir, meson.project_name(), 'plugins')
-plugin_datadir = join_paths(datadir, meson.project_name(), 'plugins')
 
 # and raven widget builds
 raven_plugin_libdir = join_paths(libdir, meson.project_name(), 'raven-plugins')
-raven_plugin_datadir = join_paths(datadir, meson.project_name(), 'raven-plugins')
 
-cdata.set_quoted('MODULEDIR', plugin_libdir)
-cdata.set_quoted('MODULE_DATA_DIR', plugin_datadir)
-cdata.set_quoted('RAVEN_PLUGIN_LIBDIR', raven_plugin_libdir)
-cdata.set_quoted('RAVEN_PLUGIN_DATADIR', raven_plugin_datadir)
 cdata.set_quoted('DATADIR', datadir)
 cdata.set_quoted('SYSCONFDIR', confdir)
 cdata.set_quoted('LOCALEDIR', localedir)
@@ -192,7 +186,6 @@ report = [
     '    localedir:                              @0@'.format(localedir),
     '    libdir:                                 @0@'.format(libdir),
     '    module library directory:               @0@'.format(plugin_libdir),
-    '    module data directory:                  @0@'.format(plugin_datadir),
     '    xdg config directory:                   @0@'.format(xdg_appdir),
     '',
     '    Extra options:',

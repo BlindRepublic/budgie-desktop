@@ -12,18 +12,6 @@
 #ifndef _BUDGIE_CONFIG_H_
 #define _BUDGIE_CONFIG_H_
 
-/* i.e. /usr/lib/budgie-desktop */
-extern const char* BUDGIE_MODULE_DIRECTORY;
-
-/* i.e. /usr/share/budgie-desktop/plugins */
-extern const char* BUDGIE_MODULE_DATA_DIRECTORY;
-
-/* i.e. /usr/lib/budgie-desktop/raven-plugins */
-extern const char* BUDGIE_RAVEN_PLUGIN_LIBDIR;
-
-/* i.e. /usr/share/budgie-desktop/raven-plugins */
-extern const char* BUDGIE_RAVEN_PLUGIN_DATADIR;
-
 /* i.e. /usr/share/ */
 extern const char* BUDGIE_DATADIR;
 

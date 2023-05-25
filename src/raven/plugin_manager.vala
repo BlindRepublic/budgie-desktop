@@ -50,14 +50,22 @@ namespace Budgie {
 				message("Error loading typelibs: %s", e.message);
 			}
 
-			/* System path */
-			var dir = Environment.get_user_data_dir();
-			engine.add_search_path(Budgie.RAVEN_PLUGIN_LIBDIR, Budgie.RAVEN_PLUGIN_DATADIR);
+			/* System (/usr) path */
+			var usr_mod = Path.build_path(Path.DIR_SEPARATOR_S, "usr", "lib", "budgie-desktop", "raven-plugins");
+			var usr_data = Path.build_path(Path.DIR_SEPARATOR_S, "usr", "share", "budgie-desktop", "raven-plugins");
+			engine.add_search_path(usr_mod, usr_data);
+
+			/* System (/usr/local) path */
+			var local_mod = Path.build_path(Path.DIR_SEPARATOR_S, "usr", "local", "lib", "budgie-desktop", "raven-plugins");
+			var local_data = Path.build_path(Path.DIR_SEPARATOR_S, "usr", "local", "share", "budgie-desktop", "raven-plugins");
+			engine.add_search_path(local_mod, local_data);
 
 			/* User path */
+			var dir = Environment.get_user_data_dir();
+
 			var user_mod = Path.build_path(Path.DIR_SEPARATOR_S, dir, "budgie-desktop", "raven-plugins");
-			var hdata = Path.build_path(Path.DIR_SEPARATOR_S, dir, "budgie-desktop", "raven-data");
-			engine.add_search_path(user_mod, hdata);
+			var user_data = Path.build_path(Path.DIR_SEPARATOR_S, dir, "budgie-desktop", "raven-data");
+			engine.add_search_path(user_mod, user_data);
 
 			engine.rescan_plugins();
 

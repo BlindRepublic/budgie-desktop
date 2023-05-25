@@ -39,11 +39,19 @@ namespace Budgie {
 				message("Error loading typelibs: %s", e.message);
 			}
 
-			/* System path */
-			var dir = Environment.get_user_data_dir();
-			engine.add_search_path(Budgie.MODULE_DIRECTORY, Budgie.MODULE_DATA_DIRECTORY);
+			/* System (/usr) path */
+			var usr_mod = Path.build_path(Path.DIR_SEPARATOR_S, "usr", "lib", "budgie-desktop", "plugins");
+			var usr_data = Path.build_path(Path.DIR_SEPARATOR_S, "usr", "share", "budgie-desktop", "plugins");
+			engine.add_search_path(usr_mod, usr_data);
+
+			/* System (/usr/local) path */
+			var local_mod = Path.build_path(Path.DIR_SEPARATOR_S, "usr", "local", "lib", "budgie-desktop", "plugins");
+			var local_data = Path.build_path(Path.DIR_SEPARATOR_S, "usr", "local", "share", "budgie-desktop", "plugins");
+			engine.add_search_path(local_mod, local_data);
 
 			/* User path */
+			var dir = Environment.get_user_data_dir();
+
 			var user_mod = Path.build_path(Path.DIR_SEPARATOR_S, dir, "budgie-desktop", "plugins");
 			var hdata = Path.build_path(Path.DIR_SEPARATOR_S, dir, "budgie-desktop", "data");
 			engine.add_search_path(user_mod, hdata);
