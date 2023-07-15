@@ -94,8 +94,10 @@ namespace Budgie {
 			Gtk.Allocation allocation;
 			int x, y;
 
-			var row = widget.get_ancestor(typeof(Gtk.ListBoxRow));
+			var row = (Gtk.ListBoxRow) widget.get_ancestor(typeof(Gtk.ListBoxRow));
 			row.get_allocation(out allocation);
+			var parent = (Gtk.ListBox) row.get_parent();
+			parent.unselect_row(row);
 
 			var surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			var draw_context = new Cairo.Context(surface);
