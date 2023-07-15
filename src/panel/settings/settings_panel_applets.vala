@@ -41,11 +41,16 @@ namespace Budgie {
 	* AppletItem is used to represent a Budgie Applet in the list
 	*/
 	public class AppletItem : Gtk.Box {
+		public const Gtk.TargetEntry[] target_entries = {
+			{"GTK_BOX", Gtk.TargetFlags.SAME_APP, 0}
+		};
+
 		/**
 		* We're bound to the info
 		*/
 		public unowned Budgie.AppletInfo? applet { public get ; construct set; }
-
+		
+		private Gtk.EventBox handle;
 		private Gtk.Image image;
 		private Gtk.Label label;
 
@@ -60,10 +65,18 @@ namespace Budgie {
 			margin_top = 4;
 			margin_bottom = 4;
 
+			handle = new Gtk.EventBox();
+			handle.drag_begin.connect(this.drag_start);
+			handle.drag_data_get.connect(this.drag_data_send);
+			Gtk.drag_source_set(handle, Gdk.ModifierType.BUTTON1_MASK, target_entries, Gdk.DragAction.MOVE);
+
 			image = new Gtk.Image();
-			image.margin_start = 12;
-			image.margin_end = 14;
-			pack_start(image, false, false, 0);
+			image.icon_size = Gtk.IconSize.MENU;
+			handle.add(image);
+
+			handle.margin_start = 12;
+			handle.margin_end = 14;
+			pack_start(handle, false, false, 0);
 
 			label = new Gtk.Label("");
 			label.margin_end = 18;
@@ -72,9 +85,18 @@ namespace Budgie {
 
 			this.applet.bind_property("name", this.label, "label", BindingFlags.DEFAULT|BindingFlags.SYNC_CREATE);
 			this.applet.bind_property("icon", this.image, "icon-name", BindingFlags.DEFAULT|BindingFlags.SYNC_CREATE);
-			this.image.icon_size = Gtk.IconSize.MENU;
 
 			this.show_all();
+		}
+
+		void drag_start(Gtk.Widget widget, Gdk.DragContext context) {
+			stdout.printf("Begin\n");
+		}
+
+		void drag_data_send(Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
+				   uint type, uint time) {
+			uchar[] data = new uchar[sizeof(Gtk.Widget)];
+			selection_data.set(selection_data.get_target(), 32, data);
 		}
 	}
 
@@ -303,6 +325,9 @@ namespace Budgie {
 			item.show_all();
 			listbox_applets.add(item);
 			items[applet.uuid] = item;
+
+			Gtk.drag_dest_set(item, Gtk.DestDefaults.ALL, AppletItem.target_entries, Gdk.DragAction.MOVE);
+			item.drag_data_received.connect(this.drag_data_receive);
 		}
 
 		/**
@@ -478,6 +503,11 @@ namespace Budgie {
 			if (current_info != null && this.toplevel.can_move_applet_right(this.current_info)) {
 				this.toplevel.move_applet_right(this.current_info);
 			}
+		}
+
+		void drag_data_receive(Gtk.Widget widget, Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
+				   uint type, uint time) {
+			stdout.printf("Receive\n");
 		}
 	}
 }
