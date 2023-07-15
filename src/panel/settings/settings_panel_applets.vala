@@ -90,7 +90,13 @@ namespace Budgie {
 		}
 
 		void drag_start(Gtk.Widget widget, Gdk.DragContext context) {
-			stdout.printf("Begin\n");
+			Gtk.Allocation allocation;
+
+			var row = widget.get_ancestor(typeof(Gtk.ListBoxRow));
+			row.get_allocation(out allocation);
+
+			var surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
+			var draw_context = new Cairo.Context(surface);
 		}
 
 		void drag_data_send(Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
