@@ -90,13 +90,24 @@ namespace Budgie {
 		}
 
 		void drag_start(Gtk.Widget widget, Gdk.DragContext context) {
+			const string STYLE_CLASS = "drag-icon";
 			Gtk.Allocation allocation;
+			int x, y;
 
 			var row = widget.get_ancestor(typeof(Gtk.ListBoxRow));
 			row.get_allocation(out allocation);
 
 			var surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			var draw_context = new Cairo.Context(surface);
+
+			var style_context = row.get_style_context();
+			style_context.add_class(STYLE_CLASS);
+			row.draw(draw_context);
+			style_context.remove_class(STYLE_CLASS);
+
+			widget.translate_coordinates (row, 0, 0, out x, out y);
+        		surface.set_device_offset (-x, -y);
+        		Gtk.drag_set_icon_surface (context, surface);
 		}
 
 		void drag_data_send(Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
