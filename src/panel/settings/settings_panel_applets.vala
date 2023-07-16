@@ -536,27 +536,45 @@ namespace Budgie {
 		void applets_drag_data_received(Gtk.Widget widget, Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
 				   uint type, uint time) {
 			Gtk.Allocation allocation;
-			var item = (AppletItem) ((Gtk.Widget[])selection_data.get_data())[0];
-			var row1 = (Gtk.ListBoxRow) item.get_parent();
+
+			var item1 = (AppletItem) ((Gtk.Widget[])selection_data.get_data())[0];
+			var row1 = (Gtk.ListBoxRow) item1.get_parent();
+
 			var row2 = ((Gtk.ListBox) widget).get_row_at_y(y);
+			var item2 = (AppletItem) row2.get_child();
 
 			if (row2 != null && row2 != row1) {
 				var index1 = row1.get_index();
 				var index2 = row2.get_index();
+				var aligns = 0;
+
 				row2.get_allocation(out allocation);
-
 				if (index2 < index1) {
-					for (int i = 0; i < index1 - index2 - 1; i++) {
-						this.toplevel.move_applet_left(item.applet);
+					if (y < allocation.y + allocation.height/2) aligns++;
+					
+					if (item1.applet.alignment != "start" && item1.applet.alignment != item2.applet.alignment) {
+						if (item1.applet.alignment == "end" && item2.applet.alignment == "start") aligns++;
+
+						aligns++;
 					}
 
-					if (y < allocation.y + allocation.height/2) this.toplevel.move_applet_left(item.applet);;
+					/* Move applet left until it reaches its destination  */
+					for (int i = 0; i < index1 - index2 + aligns - 1; i++) {
+						this.toplevel.move_applet_left(item1.applet);
+					}
 				} else {
-					for (int i = 0; i < index2 - index1 - 1; i++) {
-						this.toplevel.move_applet_right(item.applet);
+					if (y > allocation.y + allocation.height/2) aligns++;
+					
+					if (item1.applet.alignment != "end" && item1.applet.alignment != item2.applet.alignment) {
+						if (item1.applet.alignment == "start" && item2.applet.alignment == "end") aligns++;
+
+						aligns++;
 					}
 
-					if (y > allocation.y + allocation.height/2) this.toplevel.move_applet_right(item.applet);;
+					/* Move applet right until it reaches its destination  */
+					for (int i = 0; i < index2 - index1 + aligns - 1; i++) {
+						this.toplevel.move_applet_right(item1.applet);
+					}
 				}
 			}
 		}
