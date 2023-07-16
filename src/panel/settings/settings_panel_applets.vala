@@ -107,8 +107,8 @@ namespace Budgie {
 			style_context.remove_class(STYLE_CLASS);
 
 			widget.translate_coordinates(row, 0, 0, out x, out y);
-        		surface.set_device_offset(-x, -y);
-        		Gtk.drag_set_icon_surface(context, surface);
+			surface.set_device_offset(-x, -y);
+			Gtk.drag_set_icon_surface(context, surface);
 		}
 
 		void drag_data_send(Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
