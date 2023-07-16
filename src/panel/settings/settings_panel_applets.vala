@@ -255,6 +255,9 @@ namespace Budgie {
 			/* Make sure we can sort + header */
 			listbox_applets.set_sort_func(this.do_sort);
 			listbox_applets.set_header_func(this.do_headers);
+
+			Gtk.drag_dest_set(listbox_applets, Gtk.DestDefaults.ALL, AppletItem.target_entries, Gdk.DragAction.MOVE);
+			listbox_applets.drag_data_received.connect(this.drag_data_receive);
 		}
 
 		/**
@@ -344,9 +347,6 @@ namespace Budgie {
 			item.show_all();
 			listbox_applets.add(item);
 			items[applet.uuid] = item;
-
-			Gtk.drag_dest_set(item, Gtk.DestDefaults.ALL, AppletItem.target_entries, Gdk.DragAction.MOVE);
-			item.drag_data_received.connect(this.drag_data_receive);
 		}
 
 		/**
@@ -527,8 +527,7 @@ namespace Budgie {
 		void drag_data_receive(Gtk.Widget widget, Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
 				   uint type, uint time) {
 			var row1 = (Gtk.ListBoxRow) ((Gtk.Widget[])selection_data.get_data())[0].get_parent();
-			var row2 = (Gtk.ListBoxRow) widget.get_parent();
-			stdout.printf("%d, %d\n", row1.get_index(), row2.get_index());
+			stdout.printf("%d\n", row1.get_index());
 		}
 	}
 }
