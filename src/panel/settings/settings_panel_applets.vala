@@ -248,7 +248,6 @@ namespace Budgie {
 			listbox_applets.set_header_func(this.do_headers);
 
 			Gtk.drag_dest_set(listbox_applets, Gtk.DestDefaults.ALL, AppletItem.target_entries, Gdk.DragAction.MOVE);
-			listbox_applets.drag_motion.connect(this.applets_drag_motion);
 			listbox_applets.drag_data_received.connect(this.applets_drag_data_received);
 		}
 
@@ -516,23 +515,6 @@ namespace Budgie {
 			}
 		}
 
-		bool applets_drag_motion(Gtk.Widget widget, Gdk.DragContext context, int x, int y, uint time) {
-			Gtk.Allocation allocation;
-
-			var row = ((Gtk.ListBox) widget).get_row_at_y(y);
-			if (row != null) {
-				row.get_allocation(out allocation);
-
-				if (y < allocation.y + allocation.height) {
-
-				} else {
-
-				}
-			}
-
-			return true;
-		}
-
 		void applets_drag_data_received(Gtk.Widget widget, Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
 				   uint type, uint time) {
 			Gtk.Allocation allocation;
@@ -554,7 +536,6 @@ namespace Budgie {
 					
 					if (item1.applet.alignment != "start" && item1.applet.alignment != item2.applet.alignment) {
 						if (item1.applet.alignment == "end" && item2.applet.alignment == "start") aligns++;
-
 						aligns++;
 					}
 
@@ -567,7 +548,6 @@ namespace Budgie {
 					
 					if (item1.applet.alignment != "end" && item1.applet.alignment != item2.applet.alignment) {
 						if (item1.applet.alignment == "start" && item2.applet.alignment == "end") aligns++;
-
 						aligns++;
 					}
 
