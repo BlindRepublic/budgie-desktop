@@ -66,8 +66,6 @@ namespace Budgie {
 			margin_top = 4;
 			margin_bottom = 4;
 
-			this.drag_begin.connect(this.drag_start);
-			this.drag_data_get.connect(this.drag_data_send);
 			Gtk.drag_source_set(this, Gdk.ModifierType.BUTTON1_MASK, target_entries, Gdk.DragAction.MOVE);
 
 			image = new Gtk.Image();
@@ -88,12 +86,12 @@ namespace Budgie {
 			this.show_all();
 		}
 
-		void drag_start(Gtk.Widget widget, Gdk.DragContext context) {
+		public override void drag_begin(Gdk.DragContext context) {
 			const string STYLE_CLASS = "drag-icon";
 			Gtk.Allocation allocation;
 			int x, y;
 
-			var row = (Gtk.ListBoxRow) widget.get_ancestor(typeof(Gtk.ListBoxRow));
+			var row = (Gtk.ListBoxRow) this.get_ancestor(typeof(Gtk.ListBoxRow));
 			row.get_allocation(out allocation);
 			var parent = (Gtk.ListBox) row.get_parent();
 			parent.unselect_row(row);
@@ -106,15 +104,15 @@ namespace Budgie {
 			row.draw(draw_context);
 			style_context.remove_class(STYLE_CLASS);
 
-			widget.translate_coordinates(row, 0, 0, out x, out y);
+			this.translate_coordinates(row, 0, 0, out x, out y);
 			surface.set_device_offset(-x, -y);
 			Gtk.drag_set_icon_surface(context, surface);
 		}
 
-		void drag_data_send(Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
+		public override void drag_data_get(Gdk.DragContext context, Gtk.SelectionData selection_data,
 				   uint type, uint time) {
 			uchar[] data = new uchar[sizeof(Gtk.Widget)];
-			((Gtk.Widget[])data)[0] = widget;
+			((Gtk.Widget[])data)[0] = this;
 			selection_data.set(selection_data.get_target(), 32, data);
 		}
 	}
