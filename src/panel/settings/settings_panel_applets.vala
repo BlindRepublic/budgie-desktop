@@ -40,17 +40,17 @@ namespace Budgie {
 	/**
 	* AppletItem is used to represent a Budgie Applet in the list
 	*/
-	public class AppletItem : Gtk.Box {
+	public class AppletItem : Gtk.EventBox {
 		public const Gtk.TargetEntry[] target_entries = {
-			{"GTK_BOX", Gtk.TargetFlags.SAME_APP, 0}
+			{"GTK_LISTBOX", Gtk.TargetFlags.SAME_APP, 0}
 		};
 
 		/**
 		* We're bound to the info
 		*/
 		public unowned Budgie.AppletInfo? applet { public get ; construct set; }
-		
-		private Gtk.EventBox handle;
+
+		private Gtk.Box	box;
 		private Gtk.Image image;
 		private Gtk.Label label;
 
@@ -62,30 +62,29 @@ namespace Budgie {
 
 			get_style_context().add_class("applet-item");
 
+			box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
 			margin_top = 4;
 			margin_bottom = 4;
 
-			handle = new Gtk.EventBox();
-			handle.drag_begin.connect(this.drag_start);
-			handle.drag_data_get.connect(this.drag_data_send);
-			Gtk.drag_source_set(handle, Gdk.ModifierType.BUTTON1_MASK, target_entries, Gdk.DragAction.MOVE);
+			this.drag_begin.connect(this.drag_start);
+			this.drag_data_get.connect(this.drag_data_send);
+			Gtk.drag_source_set(this, Gdk.ModifierType.BUTTON1_MASK, target_entries, Gdk.DragAction.MOVE);
 
 			image = new Gtk.Image();
 			image.icon_size = Gtk.IconSize.MENU;
-			handle.add(image);
-
-			handle.margin_start = 12;
-			handle.margin_end = 14;
-			pack_start(handle, false, false, 0);
+			image.margin_start = 12;
+			image.margin_end = 14;
+			box.pack_start(image, false, false, 0);
 
 			label = new Gtk.Label("");
 			label.margin_end = 18;
 			label.halign = Gtk.Align.START;
-			pack_start(label, false, false, 0);
+			box.pack_start(label, false, false, 0);
 
 			this.applet.bind_property("name", this.label, "label", BindingFlags.DEFAULT|BindingFlags.SYNC_CREATE);
 			this.applet.bind_property("icon", this.image, "icon-name", BindingFlags.DEFAULT|BindingFlags.SYNC_CREATE);
 
+			this.add(box);
 			this.show_all();
 		}
 
@@ -107,14 +106,15 @@ namespace Budgie {
 			row.draw(draw_context);
 			style_context.remove_class(STYLE_CLASS);
 
-			widget.translate_coordinates (row, 0, 0, out x, out y);
-        		surface.set_device_offset (-x, -y);
-        		Gtk.drag_set_icon_surface (context, surface);
+			widget.translate_coordinates(row, 0, 0, out x, out y);
+        		surface.set_device_offset(-x, -y);
+        		Gtk.drag_set_icon_surface(context, surface);
 		}
 
 		void drag_data_send(Gtk.Widget widget, Gdk.DragContext context, Gtk.SelectionData selection_data,
 				   uint type, uint time) {
 			uchar[] data = new uchar[sizeof(Gtk.Widget)];
+			((Gtk.Widget[])data)[0] = widget;
 			selection_data.set(selection_data.get_target(), 32, data);
 		}
 	}
@@ -526,7 +526,9 @@ namespace Budgie {
 
 		void drag_data_receive(Gtk.Widget widget, Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
 				   uint type, uint time) {
-			stdout.printf("Receive\n");
+			var row1 = (Gtk.ListBoxRow) ((Gtk.Widget[])selection_data.get_data())[0].get_parent();
+			var row2 = (Gtk.ListBoxRow) widget.get_parent();
+			stdout.printf("%d, %d\n", row1.get_index(), row2.get_index());
 		}
 	}
 }
