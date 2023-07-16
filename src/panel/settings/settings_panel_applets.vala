@@ -87,22 +87,15 @@ namespace Budgie {
 		}
 
 		public override void drag_begin(Gdk.DragContext context) {
-			const string STYLE_CLASS = "drag-icon";
 			Gtk.Allocation allocation;
 			int x, y;
 
 			var row = (Gtk.ListBoxRow) this.get_ancestor(typeof(Gtk.ListBoxRow));
 			row.get_allocation(out allocation);
-			var parent = (Gtk.ListBox) row.get_parent();
-			parent.unselect_row(row);
 
 			var surface = new Cairo.ImageSurface (Cairo.Format.ARGB32, allocation.width, allocation.height);
 			var draw_context = new Cairo.Context(surface);
-
-			var style_context = row.get_style_context();
-			style_context.add_class(STYLE_CLASS);
 			row.draw(draw_context);
-			style_context.remove_class(STYLE_CLASS);
 
 			this.translate_coordinates(row, 0, 0, out x, out y);
 			surface.set_device_offset(-x, -y);
@@ -255,7 +248,8 @@ namespace Budgie {
 			listbox_applets.set_header_func(this.do_headers);
 
 			Gtk.drag_dest_set(listbox_applets, Gtk.DestDefaults.ALL, AppletItem.target_entries, Gdk.DragAction.MOVE);
-			listbox_applets.drag_data_received.connect(this.drag_data_receive);
+			listbox_applets.drag_motion.connect(this.applets_drag_motion);
+			listbox_applets.drag_data_received.connect(this.applets_drag_data_received);
 		}
 
 		/**
@@ -522,10 +516,49 @@ namespace Budgie {
 			}
 		}
 
-		void drag_data_receive(Gtk.Widget widget, Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
+		bool applets_drag_motion(Gtk.Widget widget, Gdk.DragContext context, int x, int y, uint time) {
+			Gtk.Allocation allocation;
+
+			var row = ((Gtk.ListBox) widget).get_row_at_y(y);
+			if (row != null) {
+				row.get_allocation(out allocation);
+
+				if (y < allocation.y + allocation.height) {
+
+				} else {
+
+				}
+			}
+
+			return true;
+		}
+
+		void applets_drag_data_received(Gtk.Widget widget, Gdk.DragContext context, int x, int y, Gtk.SelectionData selection_data,
 				   uint type, uint time) {
-			var row1 = (Gtk.ListBoxRow) ((Gtk.Widget[])selection_data.get_data())[0].get_parent();
-			stdout.printf("%d\n", row1.get_index());
+			Gtk.Allocation allocation;
+			var item = (AppletItem) ((Gtk.Widget[])selection_data.get_data())[0];
+			var row1 = (Gtk.ListBoxRow) item.get_parent();
+			var row2 = ((Gtk.ListBox) widget).get_row_at_y(y);
+
+			if (row2 != null && row2 != row1) {
+				var index1 = row1.get_index();
+				var index2 = row2.get_index();
+				row2.get_allocation(out allocation);
+
+				if (index2 < index1) {
+					for (int i = 0; i < index1 - index2 - 1; i++) {
+						this.toplevel.move_applet_left(item.applet);
+					}
+
+					if (y < allocation.y + allocation.height/2) this.toplevel.move_applet_left(item.applet);;
+				} else {
+					for (int i = 0; i < index2 - index1 - 1; i++) {
+						this.toplevel.move_applet_right(item.applet);
+					}
+
+					if (y > allocation.y + allocation.height/2) this.toplevel.move_applet_right(item.applet);;
+				}
+			}
 		}
 	}
 }
